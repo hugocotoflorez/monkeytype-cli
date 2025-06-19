@@ -16,11 +16,26 @@ def termtoosmall(width,height):
     print(f"Terminal Is {term.width}x{term.height}")
     print(f"Minimum Is {width}x{height}")
 
+words_file=None
+def getwordsfile():
+    from os import listdir
+    if words_file:
+        return words_file
+    if 'words.txt' in listdir('.'):
+        return 'words.txt'
+    if 'words.txt' in listdir('/etc/monkeytype-cli/'):
+        return '/etc/monkeytype-cli/words.txt'
+    print(f"Can not find words.txt")
+    print(f"{term.blue}<SUGGESTION> Fix the code yourself and make a pull request on {term.link('https://github.com/Spelis/monkeytype-cli/','GitHub')}")
+    print(f"{term.blue}<SUGGESTION> Report this error on {term.link('https://github.com/Spelis/monkeytype-cli/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=','GitHub')}.{term.normal}")
+    return ''
+
+
 def getwords(n):
     words = []
     g = 0
     nochars = ['[', ']', '{', '}', '(', ')', '*', '&', '^', '%', '$', '#', '@', '!', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '`', '~', '?', '>', '<', ':', ';', '\\', '|', '-', '_', '=', '+', '/']
-    with open('/etc/monkeytype-cli/words.txt') as f:
+    with open(getwordsfile()) as f:
         f = f.read()
         for char in nochars:
             f = f.strip(char)
@@ -53,6 +68,7 @@ class menuInput:
         MIVars[str(self.varname)] = self.input
     def get(self):
         return self.input
+
 def menuloop(title, tabs, selectable=True):
     try:
         default = term.inkey(0)
@@ -226,7 +242,7 @@ def starttest():
         menuloop("Test Completed!", {
         "Results": {
             f"WPM: {round(wpm)}": print,
-            f"Accuracy: {round(accuracy, 2)}%": print, 
+            f"Accuracy: {round(accuracy, 2)}%": print,
             "Redo Test": starttest,
             "Main Menu": mainmenu
         }
